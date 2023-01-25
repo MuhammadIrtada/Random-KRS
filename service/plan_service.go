@@ -17,6 +17,7 @@ type PlanService interface {
 	Show(kelass []entity.Kelas)
 	Random(matkul []entity.Matkul, hasil [][]entity.Kelas) [][]entity.Kelas
 	GetKelasFromMatkul() []entity.Kelas
+	Filter(filter [][]int, jadwals [][]entity.Kelas) [][]entity.Kelas
 }
 
 type planService struct {
@@ -173,4 +174,25 @@ func (service *planService) JadwalPosition(hari, jamMulai, jamSelesai string, ke
 		}
 	}
 	return kelasJadwal
+}
+
+func (service *planService) Filter(filter [][]int, jadwals [][]entity.Kelas) [][]entity.Kelas {
+	jadwalsBaru := [][]entity.Kelas{}
+
+	for _, jadwal := range jadwals {
+		isLibur := false
+		for _, kelas := range jadwal {
+			for i, hari := range filter {
+				for j, jam := range hari {
+					if kelas.JamMulai == service.jam[j][0] && kelas.JamSelesai == service.jam[j][1] && jam == 1 && kelas.Hari == service.hari[i]{
+						isLibur = true
+					}
+				}
+			}
+		}
+		if !isLibur {
+			jadwalsBaru = append(jadwalsBaru, jadwal)
+		}
+	}
+	return jadwalsBaru
 }

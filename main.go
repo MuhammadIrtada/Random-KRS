@@ -109,17 +109,54 @@ func main() {
 	// planService.Show(planService.GetKelasFromMatkul())
 
 	// Menampilkan semua jadwal pada random
-	for i, v := range hasilRandom {
+	// Show(hasilRandom, planService)
+	
+	// Menampilkan semua jadwal pada random format nama kelas
+	// ShowNamaKelas(hasilRandom, matkulService)
+
+	filterLibur := [][]int{
+	//   07.00 - 08.39 -> 1
+	//   07.50 - 08.39 -> 2
+	//   08.45 - 10.24 -> 3
+	//   09.35 - 10.24 -> 4
+	//   10.30 - 11.19 -> 5
+	//   10.30 - 12.09 -> 6
+	//   11.20 - 12.09 -> 7
+	//   13.00 - 13.49 -> 8
+	//   13.00 - 14.39 -> 9
+	//   13.50 - 14.39 -> 10
+	//   14.45 - 15.34 -> 11
+	//   14.45 - 16.24 -> 12
+	//   15.35 - 16.24 -> 13
+	//   16.30 - 18.09 -> 14
+	//   17.20 - 18.09 -> 15
+	//	 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Senin
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Selasa
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Rabu
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Kamis
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Jumat
+	}
+
+	filtered := planService.Filter(filterLibur, hasilRandom)
+
+	// Menampilkan semua jadwal pada yang sudah di filter dari random
+	Show(filtered, planService)
+}
+
+func Show(jadwal [][]entity.Kelas, planService service.PlanService)  {
+	for i, v := range jadwal {
 		fmt.Println("==========", i+1, "==========")
 		planService.Show(v)
 	}
-	
-	// Menampilkan semua jadwal pada random format nama kelas
-	// for i := 0; i < len(hasilRandom); i++ {
-	// 	fmt.Print(i+1, " || ")
-	// 	for _, v := range hasilRandom[i] {
-	// 		fmt.Print(matkulService.Singkatan(v.Matkul), " ", v.NamaKelas, " | ")
-	//	}
-	// 	fmt.Println()
-	// }
+}
+
+func ShowNamaKelas(hasilRandom [][]entity.Kelas, matkulService service.MatkulService)  {
+	for i := 0; i < len(hasilRandom); i++ {
+		fmt.Print(i+1, " || ")
+		for _, v := range hasilRandom[i] {
+			fmt.Print(matkulService.Singkatan(v.Matkul), " ", v.NamaKelas, " | ")
+		}
+		fmt.Println()
+	}
 }
