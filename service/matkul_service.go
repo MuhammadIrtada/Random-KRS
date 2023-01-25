@@ -9,7 +9,7 @@ import (
 )
 
 type MatkulService interface {
-	Insert(kode, nama string, sks, tahunKurikulum int, kelas []entity.Kelas)
+	Insert(kode, nama string, sks, tahunKurikulum int)
 	List() []entity.Matkul
 	FindMatkul(filter string, data interface{}) []entity.Matkul
 	Update(kode string, data entity.Matkul)
@@ -29,13 +29,12 @@ func NewMatkulService(collection []entity.Matkul) MatkulService {
 	}
 }
 
-func (service *matkulService) Insert(kode, nama string, sks, tahunKurikulum int, kelas []entity.Kelas) {
+func (service *matkulService) Insert(kode, nama string, sks, tahunKurikulum int) {
 	newMatkul := entity.Matkul{
 		Kode:           kode,
 		Nama:           nama,
 		Sks:            sks,
 		TahunKurikulum: tahunKurikulum,
-		Kelas:          kelas,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
 	}

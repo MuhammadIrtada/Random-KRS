@@ -9,13 +9,13 @@ import (
 func main() {
 	// Membuat Mata Kuliah
 	matkulService := service.NewMatkulService([]entity.Matkul{})
-	matkulService.Insert("CIT61006", "Pengembangan Aplikasi Web", 4, 2020, nil)
-	matkulService.Insert("CIT61008", "Analisis dan Desain Sistem Informasi", 4, 2020, nil)
-	matkulService.Insert("CSD60001", "Pemrograman Basis Data", 3, 2020, nil)
-	matkulService.Insert("CIT61007", "Algoritma dan Struktur Data", 3, 2020, nil)
-	matkulService.Insert("CIT61009", "Jaringan Komputer Dasar", 4, 2020, nil)
-	matkulService.Insert("UBU60003", "Kewirausahaan", 2, 2020, nil)
-	matkulService.Insert("COM60052", "Etika Profesi", 2, 2020, nil)
+	matkulService.Insert("CIT61006", "Pengembangan Aplikasi Web", 4, 2020)
+	matkulService.Insert("CIT61008", "Analisis dan Desain Sistem Informasi", 4, 2020)
+	matkulService.Insert("CSD60001", "Pemrograman Basis Data", 3, 2020)
+	matkulService.Insert("CIT61007", "Algoritma dan Struktur Data", 3, 2020)
+	matkulService.Insert("CIT61009", "Jaringan Komputer Dasar", 4, 2020)
+	matkulService.Insert("UBU60003", "Kewirausahaan", 2, 2020)
+	matkulService.Insert("COM60052", "Etika Profesi", 2, 2020)
 
 	// Membuat Kelas
 	kelasService := service.NewKelasService([]entity.Kelas{}, &matkulService)
