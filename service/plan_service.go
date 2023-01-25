@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"random-krs/entity"
 	"strings"
+
+	"golang.org/x/exp/slices"
 )
 
 type PlanService interface {
@@ -13,7 +15,7 @@ type PlanService interface {
 	Update()
 	Delete()
 	Show(kelass []entity.Kelas)
-	Random(list []entity.Kelas) [][]entity.Kelas
+	Random(matkul []entity.Matkul, hasil [][]entity.Kelas) [][]entity.Kelas
 	GetKelasFromMatkul() []entity.Kelas
 }
 
@@ -23,9 +25,10 @@ type planService struct {
 	hari          []string
 	jam           [][]string
 	matkulService MatkulService
+	kelasService  KelasService
 }
 
-func NewPlanService(collection []entity.Plan, matkul []entity.Matkul, matkulService MatkulService) PlanService {
+func NewPlanService(collection []entity.Plan, matkul []entity.Matkul, matkulService MatkulService, kelasService KelasService) PlanService {
 	hari := []string{"Senin", "Selasa", "Rabu", "Kamis", "Jumat"}
 	jam := [][]string{
 		{"07.00", "08.39"},
@@ -51,6 +54,7 @@ func NewPlanService(collection []entity.Plan, matkul []entity.Matkul, matkulServ
 		hari:          hari,
 		jam:           jam,
 		matkulService: matkulService,
+		kelasService:  kelasService,
 	}
 }
 
@@ -99,8 +103,8 @@ func (service *planService) Show(kelass []entity.Kelas) {
 			for _, h := range service.hari {
 				kelasJadwals := service.JadwalPosition(h, j[0], j[1], kelass)
 				cetak := ""
-				
-				if len(kelasJadwals) > 0 && i < len(kelasJadwals){
+
+				if len(kelasJadwals) > 0 && i < len(kelasJadwals) {
 					cetak = kelasJadwals[i]
 				}
 				fmt.Printf(" %-8s|", cetak)
@@ -110,11 +114,46 @@ func (service *planService) Show(kelass []entity.Kelas) {
 		fmt.Println(strings.Repeat("-", 66))
 	}
 }
-func (service *planService) Random(list []entity.Kelas) [][]entity.Kelas{
-	listRandom := [][]entity.Kelas{}
-	service.Random(list[1:])
+func (service *planService) Random(matkul []entity.Matkul, hasil [][]entity.Kelas) [][]entity.Kelas {
+	for i, namaKelas := range service.matkulService.GetAllNameKelas(matkul[0]) {
+		kelasBaru := service.kelasService.FindKelas("nama kelas dari matkul", []string{matkul[0].Kode, namaKelas})
+		if len(matkul) == 1 {
+			hasil = append(hasil, []entity.Kelas{})
 
-	return listRandom
+			hasil[len(hasil)-1] = append(hasil[len(hasil)-1], kelasBaru...)
+			
+			if i == len(service.matkulService.GetAllNameKelas(matkul[0]))-1 {				
+				return hasil
+			}
+		} else {
+			lenHasilLama := len(hasil)
+			hasil = append(hasil, service.Random(matkul[1:], [][]entity.Kelas{})...)
+
+			for i := lenHasilLama; i < len(hasil); i++ {
+				isNabrak := false
+				for _, kelasJadwal := range hasil[i] {
+					for _, kelasTambah := range kelasBaru {
+						if kelasJadwal.JamMulai == kelasTambah.JamMulai && kelasJadwal.JamSelesai == kelasTambah.JamSelesai && kelasJadwal.Hari == kelasTambah.Hari{
+							isNabrak = true
+						}
+					}
+				}
+				if !isNabrak {
+					hasil[i] = append(hasil[i], kelasBaru...)
+					continue
+				}
+				hasil = slices.Delete(hasil, i, i+1)
+				i--
+			}
+			
+			
+			if i == len(service.matkulService.GetAllNameKelas(matkul[0]))-1 {
+				
+				return hasil
+			}
+		}
+	}
+	return hasil
 }
 
 func (service *planService) GetKelasFromMatkul() []entity.Kelas {
@@ -126,7 +165,6 @@ func (service *planService) GetKelasFromMatkul() []entity.Kelas {
 }
 
 func (service *planService) JadwalPosition(hari, jamMulai, jamSelesai string, kelass []entity.Kelas) []string {
-	
 
 	kelasJadwal := []string{}
 	for _, kelas := range kelass {

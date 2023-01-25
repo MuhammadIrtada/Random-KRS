@@ -16,6 +16,7 @@ type MatkulService interface {
 	Delete()
 	Show(matkuls []entity.Matkul)
 	Singkatan(matkul entity.Matkul) string
+	GetAllNameKelas(matkul entity.Matkul) []string
 }
 
 type matkulService struct {
@@ -90,7 +91,7 @@ func (service *matkulService) Show(matkuls []entity.Matkul) {
 	fmt.Println("No", "||", "Nama Matkul", strings.Repeat(" ", 39), "||", "Kode", strings.Repeat(" ", 3), "||", "SKS", "||", "Tahun Kurikulum", "||", "Jumlah Kelas")
 	fmt.Println(strings.Repeat("=", 111))
 	for i, matkul := range matkuls {
-		fmt.Printf("%-3d|| %-51s || %-5s ||  %-2d || %5s%-10d ||%6d\n", i+1, matkul.Nama, matkul.Kode, matkul.Sks, " ", matkul.TahunKurikulum, service.CountKelas(matkul))
+		fmt.Printf("%-3d|| %-51s || %-5s ||  %-2d || %5s%-10d ||%6d\n", i+1, matkul.Nama, matkul.Kode, matkul.Sks, " ", matkul.TahunKurikulum, len(service.GetAllNameKelas(matkul)))
 		fmt.Println(strings.Repeat("-", 111))
 	}
 }
@@ -106,7 +107,7 @@ func (service *matkulService) Singkatan(matkul entity.Matkul) string {
 	return singkatan
 }
 
-func (service *matkulService) CountKelas(matkul entity.Matkul) int {
+func (service *matkulService) GetAllNameKelas(matkul entity.Matkul) []string {
 	uniqueKelas := []string{}
 
 	for _, kelas := range matkul.Kelas {
@@ -129,5 +130,5 @@ func (service *matkulService) CountKelas(matkul entity.Matkul) int {
 		}
 	}
 
-	return len(uniqueKelas)
+	return uniqueKelas
 }

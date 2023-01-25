@@ -43,33 +43,18 @@ func (service *kelasService) Insert(nama, hari, jamMulai, jamSelesai, ruangKelas
 
 	// kelass := service.FindKelas("kode matkul", matkul.Kode)
 	matkulTarget := service.matkulService.FindMatkul("kode", matkul.Kode)
-	// lenKelas := len(kelass)
+	kelasBaru := append(matkulTarget[0].Kelas, newKelas)
+	data := entity.Matkul{
+		Kelas: kelasBaru,
+	}
+	service.matkulService.Update(matkul.Kode, data)
 
-	// if lenKelas == 0 {
-	// 	kelass = append(kelass, newKelas)
-	// }
-
-	// for i, kelas := range  kelass{
-	// 	if kelas.NamaKelas == nama && lenKelas > 0{
-	// 		break;
-	// 	}
-
-	// 	if i != len(kelass) - 1 {
-	// 		continue
-	// 	}
-		kelasBaru := append(matkulTarget[0].Kelas, newKelas)
-		data := entity.Matkul{
-			Kelas: kelasBaru,
-		}
-		service.matkulService.Update(matkul.Kode, data)
-	// }
-	
 	service.collection = append(service.collection, newKelas)
 }
-func (service *kelasService) List() []entity.Kelas{
+func (service *kelasService) List() []entity.Kelas {
 	return service.collection
 }
-func (service *kelasService) FindKelas(filter string, data interface{}) []entity.Kelas {
+func (service *kelasService) FindKelas(filter string, data interface{}) []entity.Kelas{
 	kelas := []entity.Kelas{}
 
 	category := func(filter string, kelas entity.Kelas) interface{} {
@@ -78,17 +63,35 @@ func (service *kelasService) FindKelas(filter string, data interface{}) []entity
 			return kelas.Matkul.Kode
 		case "nama matkul":
 			return kelas.Matkul.Nama
+		case "nama kelas":
+			return kelas.NamaKelas
 		case "hari":
 			return kelas.Hari
 		}
 		return nil
 	}
 
-	for _, k := range service.collection {
-		if category(filter, k) == data {
-			kelas = append(kelas, k)
+	hasilKelas := func(filter string, list []entity.Kelas, data interface{}) []entity.Kelas {
+		kelas := []entity.Kelas{}
+
+		for _, k := range list {
+			if category(filter, k) == data {
+				kelas = append(kelas, k)
+			}
+			continue
 		}
-		continue
+		return kelas
+	}
+
+	switch filter {
+	case "nama kelas dari matkul":
+		switch data := data.(type) {
+		case []string:
+			data = append(data, data...)
+			kelas = append(kelas, hasilKelas("nama kelas", hasilKelas("kode matkul", service.collection, data[0]), data[1])...)
+		}
+	default:
+		kelas = append(kelas, hasilKelas(filter, service.collection, data)...)
 	}
 
 	return kelas

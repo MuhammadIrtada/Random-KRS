@@ -19,7 +19,6 @@ func main() {
 
 	// Membuat Kelas
 	kelasService := service.NewKelasService([]entity.Kelas{}, &matkulService)
-
 	// /*
 
 	// PAW
@@ -103,41 +102,24 @@ func main() {
 	// kelasService.Show(kelasService.List())
 
 	// Membuat Plan
-	// planService := service.NewPlanService([]entity.Plan{}, matkulService.List(), matkulService)
+	planService := service.NewPlanService([]entity.Plan{}, matkulService.List(), matkulService, kelasService)
+	hasilRandom := planService.Random(matkulService.List(), [][]entity.Kelas{})
 
-	// var xs, ys, zs = 5, 6, 7        // axis sizes
-	// var world = make([][][]int, xs) // x axis
-
-	// for x := 0; x < xs; x++ {
-	// 	world[x] = make([][]int, ys) // y axis
-	// 	for y := 0; y < ys; y++ {
-	// 		world[x][y] = make([]int, zs) // z axis
-	// 		if x == 0 && y == 0{
-	// 			// fmt.Println(world)
-	// 		}
-	// 		for z := 0; z < zs; z++ {
-	// 			world[x][y][z] = (x+1)*100 + (y+1)*10 + (z+1)*1
-	// 		}
-	// 	}
-	// }
-
-	// h, _ := time.ParseDuration("4h17m")
-	// fmt.Println(h.Hours())
-
+	// Menampilkan semua kelas pada jadwal
 	// planService.Show(planService.GetKelasFromMatkul())
 
-	b := []int{1, 1, 2, 3}
-	fmt.Println(test(b, []int{}))
-}
-
-func test(angka []int, buffer []int) []int {
-	if len(buffer) == 0 {
-		buffer = append(buffer, angka[0])
+	// Menampilkan semua jadwal pada random
+	for i, v := range hasilRandom {
+		fmt.Println("==========", i+1, "==========")
+		planService.Show(v)
 	}
-
-	if len(angka) == 1 {
-		return angka
+	
+	// Menampilkan semua jadwal pada random format nama kelas
+	for i := 0; i < len(hasilRandom); i++ {
+		fmt.Print(i+1, " || ")
+		for _, v := range hasilRandom[i] {
+			fmt.Print(matkulService.Singkatan(v.Matkul), " ", v.NamaKelas, " | ")
+		}
+		fmt.Println()
 	}
-
-	return append(buffer, angka[1:]...)
 }
