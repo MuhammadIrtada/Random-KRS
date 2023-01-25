@@ -115,11 +115,11 @@ func main() {
 	}
 	
 	// Menampilkan semua jadwal pada random format nama kelas
-	for i := 0; i < len(hasilRandom); i++ {
-		fmt.Print(i+1, " || ")
-		for _, v := range hasilRandom[i] {
-			fmt.Print(matkulService.Singkatan(v.Matkul), " ", v.NamaKelas, " | ")
-		}
-		fmt.Println()
-	}
+	// for i := 0; i < len(hasilRandom); i++ {
+	// 	fmt.Print(i+1, " || ")
+	// 	for _, v := range hasilRandom[i] {
+	// 		fmt.Print(matkulService.Singkatan(v.Matkul), " ", v.NamaKelas, " | ")
+	//	}
+	// 	fmt.Println()
+	// }
 }
