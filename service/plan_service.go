@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"random-krs/entity"
+	"random-krs/helper"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -18,6 +19,7 @@ type PlanService interface {
 	Random(matkul []entity.Matkul, hasil [][]entity.Kelas) [][]entity.Kelas
 	GetKelasFromMatkul() []entity.Kelas
 	Filter(filter [][]int, jadwals [][]entity.Kelas) [][]entity.Kelas
+	FilterByKelas(filters []string, jadwals [][]entity.Kelas) [][]entity.Kelas
 }
 
 type planService struct {
@@ -29,25 +31,8 @@ type planService struct {
 	kelasService  KelasService
 }
 
-func NewPlanService(collection []entity.Plan, matkul []entity.Matkul, matkulService MatkulService, kelasService KelasService) PlanService {
+func NewPlanService(collection []entity.Plan, matkul []entity.Matkul, jam [][]string,matkulService MatkulService, kelasService KelasService) PlanService {
 	hari := []string{"Senin", "Selasa", "Rabu", "Kamis", "Jumat"}
-	jam := [][]string{
-		{"07.00", "08.39"},
-		{"07.50", "08.39"},
-		{"08.45", "10.24"},
-		{"09.35", "10.24"},
-		{"10.30", "11.19"},
-		{"10.30", "12.09"},
-		{"11.20", "12.09"},
-		{"13.00", "13.49"},
-		{"13.00", "14.39"},
-		{"13.50", "14.39"},
-		{"14.45", "15.34"},
-		{"14.45", "16.24"},
-		{"15.35", "16.24"},
-		{"16.30", "18.09"},
-		{"17.20", "18.09"},
-	}
 
 	return &planService{
 		collection:    collection,
@@ -122,8 +107,8 @@ func (service *planService) Random(matkul []entity.Matkul, hasil [][]entity.Kela
 			hasil = append(hasil, []entity.Kelas{})
 
 			hasil[len(hasil)-1] = append(hasil[len(hasil)-1], kelasBaru...)
-			
-			if i == len(service.matkulService.GetAllNameKelas(matkul[0]))-1 {				
+
+			if i == len(service.matkulService.GetAllNameKelas(matkul[0]))-1 {
 				return hasil
 			}
 		} else {
@@ -134,7 +119,7 @@ func (service *planService) Random(matkul []entity.Matkul, hasil [][]entity.Kela
 				isNabrak := false
 				for _, kelasJadwal := range hasil[i] {
 					for _, kelasTambah := range kelasBaru {
-						if kelasJadwal.JamMulai == kelasTambah.JamMulai && kelasJadwal.JamSelesai == kelasTambah.JamSelesai && kelasJadwal.Hari == kelasTambah.Hari{
+						if ((kelasJadwal.JamMulai == kelasTambah.JamMulai && kelasJadwal.JamSelesai == kelasTambah.JamSelesai && kelasJadwal.Hari == kelasTambah.Hari) || (kelasJadwal.Hari == kelasTambah.Hari && helper.StringToHours(kelasTambah.JamMulai) >= helper.StringToHours(kelasJadwal.JamMulai) && kelasTambah.JamMulai < kelasJadwal.JamSelesai) || (kelasJadwal.Hari == kelasTambah.Hari && helper.StringToHours(kelasTambah.JamMulai) <= helper.StringToHours(kelasJadwal.JamMulai) && kelasTambah.JamSelesai > kelasJadwal.JamMulai)) {
 							isNabrak = true
 						}
 					}
@@ -146,10 +131,9 @@ func (service *planService) Random(matkul []entity.Matkul, hasil [][]entity.Kela
 				hasil = slices.Delete(hasil, i, i+1)
 				i--
 			}
-			
-			
+
 			if i == len(service.matkulService.GetAllNameKelas(matkul[0]))-1 {
-				
+
 				return hasil
 			}
 		}
@@ -184,13 +168,32 @@ func (service *planService) Filter(filter [][]int, jadwals [][]entity.Kelas) [][
 		for _, kelas := range jadwal {
 			for i, hari := range filter {
 				for j, jam := range hari {
-					if kelas.JamMulai == service.jam[j][0] && kelas.JamSelesai == service.jam[j][1] && jam == 1 && kelas.Hari == service.hari[i]{
+					if kelas.JamMulai == service.jam[j][0] && kelas.JamSelesai == service.jam[j][1] && jam == 1 && kelas.Hari == service.hari[i] {
 						isLibur = true
 					}
 				}
 			}
 		}
 		if !isLibur {
+			jadwalsBaru = append(jadwalsBaru, jadwal)
+		}
+	}
+	return jadwalsBaru
+}
+
+func (service *planService) FilterByKelas(filters []string, jadwals [][]entity.Kelas) [][]entity.Kelas {
+	jadwalsBaru := [][]entity.Kelas{}
+	
+	for _, jadwal := range jadwals {
+		isSama := false
+		for _, kelas := range jadwal {
+			for _, filter := range filters {
+				if service.matkulService.Singkatan(kelas.Matkul)+" "+kelas.NamaKelas == strings.ToUpper(filter) {
+					isSama = true
+				}
+			}
+		}
+		if !isSama {
 			jadwalsBaru = append(jadwalsBaru, jadwal)
 		}
 	}

@@ -1,5 +1,5 @@
 # Random-KRS
-To get all possibility KRS schedule from selected class
+To get all possibility KRS schedule from selected matkul
 
 1. Install golang di atas versi 1.18, Jika belum bisa didownload di https://go.dev/dl/
 2. Download Repository tersebut

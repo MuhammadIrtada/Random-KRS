@@ -2,4 +2,4 @@ module random-krs
 
 go 1.19
 
-require golang.org/x/exp v0.0.0-20230118134722-a68e582fa157
+require golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874
