@@ -25,7 +25,10 @@ To get all possibility KRS schedule from selected matkul
 9. Pada bagian filter, jika ingin di suatu hari dan jam menjadi libur rubah angka 0 menjadi 1
 - Contoh hari jumat libur :
 - ![image](https://user-images.githubusercontent.com/88333614/215090337-c0d59c30-6d7c-4149-bb3d-04d2b130770a.png)
-10. Jika ingin menghindari suatu kelas dapat dengan :
+10. Jika ingin filter suatu kelas dapat dengan :
 - Masukkan singkatan nama matkul dengan huruf depan setiap kata kemudian nama kelas yang dihindari
 - ![image](https://user-images.githubusercontent.com/88333614/215095614-bf83cbba-d4d4-4021-bd17-2bb307265069.png)
+- Jika ingin menghindari suatu kelas masukkan kata kunci "without"
+- Jika ingin memunculkan matkul yang diinginkan masukkan kata kunci "with"
+- ![image](https://user-images.githubusercontent.com/88333614/215416486-3f30aa9f-0e38-45d5-bf67-0162b582b5b1.png)
 11. Jalankan di cmd/terminal dengan mengetikkan "go run main.go"
