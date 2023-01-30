@@ -19,7 +19,7 @@ type PlanService interface {
 	Random(matkul []entity.Matkul, hasil [][]entity.Kelas) [][]entity.Kelas
 	GetKelasFromMatkul() []entity.Kelas
 	Filter(filter [][]int, jadwals [][]entity.Kelas) [][]entity.Kelas
-	FilterByKelas(filters []string, jadwals [][]entity.Kelas) [][]entity.Kelas
+	FilterByKelas(mode string, filters []string, jadwals [][]entity.Kelas) [][]entity.Kelas
 }
 
 type planService struct {
@@ -181,21 +181,68 @@ func (service *planService) Filter(filter [][]int, jadwals [][]entity.Kelas) [][
 	return jadwalsBaru
 }
 
-func (service *planService) FilterByKelas(filters []string, jadwals [][]entity.Kelas) [][]entity.Kelas {
+func (service *planService) FilterByKelas(mode string, filters []string, jadwals [][]entity.Kelas) [][]entity.Kelas {
 	jadwalsBaru := [][]entity.Kelas{}
-	
-	for _, jadwal := range jadwals {
-		isSama := false
-		for _, kelas := range jadwal {
-			for _, filter := range filters {
-				if service.matkulService.Singkatan(kelas.Matkul)+" "+kelas.NamaKelas == strings.ToUpper(filter) {
-					isSama = true
-				}
+	uniqueKelasFromJadwal := [][]string{}
+
+	removeDuplicateValues := func (slice []string) []string {
+		keys := make(map[string]bool)
+		list := []string{}
+
+		for _, entry := range slice {
+			if _, value := keys[entry]; !value {
+				keys[entry] = true
+				list = append(list, entry)
 			}
 		}
-		if !isSama {
-			jadwalsBaru = append(jadwalsBaru, jadwal)
-		}
+		return list
 	}
-	return jadwalsBaru
+
+	switch mode {
+	case "with":
+		newFilters := []string{}
+		for _, filter := range filters {
+			newFilters = append(newFilters, strings.Split(filter, " ")[0])
+		}
+		newFilters = removeDuplicateValues(newFilters)
+
+		for i, jadwal := range jadwals {
+			uniqueKelas := []string{}
+			count := 0
+
+			for _, kelas := range jadwal {
+				uniqueKelas = append(uniqueKelas, service.matkulService.Singkatan(kelas.Matkul)+" "+kelas.NamaKelas)
+			}
+			uniqueKelasFromJadwal = append(uniqueKelasFromJadwal, removeDuplicateValues(uniqueKelas))
+			
+			for _, kelasJadwal := range uniqueKelasFromJadwal[i] {
+				for _, filter := range  filters{
+					if kelasJadwal == filter {
+						count++
+					}
+				}
+			}
+
+			if count == len(newFilters) {
+				jadwalsBaru = append(jadwalsBaru, jadwal)
+			}
+		}
+		return jadwalsBaru
+	case "without":
+		for _, jadwal := range jadwals {
+			isSama := false
+			for _, kelas := range jadwal {
+				for _, filter := range filters {
+					if service.matkulService.Singkatan(kelas.Matkul)+" "+kelas.NamaKelas == strings.ToUpper(filter) {
+						isSama = true
+					}
+				}
+			}
+			if !isSama {
+				jadwalsBaru = append(jadwalsBaru, jadwal)
+			}
+		}
+		return jadwalsBaru
+	}
+	return nil
 }

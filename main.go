@@ -18,14 +18,10 @@ func main() {
 	matkulService.Insert("CIT62018", "Keamanan Informasi", 3, 2020)
 	matkulService.Insert("CIT60031", "Manajemen Proyek Teknologi Informasi", 3, 2020)
 	// matkulService.Insert("CIT60034", "Sistem Informasi Geografi", 3, 2020)
+	// matkulService.Insert("CIT60033", "Sistem Forensik Digital", 3, 2020)
 
 	// Membuat Kelas
 	kelasService := service.NewKelasService([]entity.Kelas{}, &matkulService)
-	// kelasService.Insert("D", "Senin", "07.00", "09.29", "F2.9", matkulService.FindMatkul("nama", "Tata Kelola Teknologi Informasi")[0])
-	// kelasService.Insert("A", "Senin", "08.40", "10.19", "G1.6", matkulService.FindMatkul("nama", "Pengembangan Aplikasi Mobile")[0])
-	// kelasService.Insert("D", "Senin", "09.30", "11.59", "F3.5", matkulService.FindMatkul("nama", "Keamanan Informasi")[0])
-	// kelasService.Insert("B", "Selasa", "08.40", "10.19", "G1.6", matkulService.FindMatkul("nama", "Pengembangan Aplikasi Mobile")[0])
-	// kelasService.Insert("C", "Senin", "07.00", "08.39", "F4.12", matkulService.FindMatkul("nama", "Teknologi Integrasi Sistem")[0])
 	// /*
 
 	// PAM
@@ -80,14 +76,15 @@ func main() {
 	kelasService.Insert("B", "Selasa", "12.50", "15.19", "F4.6", matkulService.FindMatkul("nama", "Manajemen Proyek Teknologi Informasi")[0])
 	// SIG
 	// kelasService.Insert("A", "Kamis", "09.30", "11.59", "F3.16", matkulService.FindMatkul("nama", "Sistem Informasi Geografi")[0])
-
+	// SFD
+	// kelasService.Insert("A", "Senin", "15.30", "18.00", "F3.6", matkulService.FindMatkul("nama", "Sistem Forensik Digital")[0])
 	// **/
 
 	// Menampilkan Semua Matkul
 	// matkulService.Show(matkulService.List())
 	// fmt.Printf("\n\n\n")
 
-	// // Menampilkan Semua Kelas
+	// Menampilkan Semua Kelas
 	// kelasService.Show(kelasService.List())
 
 	// Membuat Plan
@@ -132,21 +129,31 @@ func main() {
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Selasa
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Rabu
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Kamis
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Jumat
+		{0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0}, // Jumat
 	}
 
 	filtered := planService.Filter(filterLibur, hasilRandom)
 
-	// Pembuatan Filter Berdasarkan Kelas yang dihindari
+	// Pembuatan Filter Berdasarkan Kelas yang sudah atau akan diambil dan yang dihindari
+	// Jika ingin mengambil dapat menggunakan kata kunci "with"
+	// Jika tidak ingin mengambil dapat menggunakan kata kunci "without"
 	// Ex :
 	// filterByKelas := []string{
 	// 	"ADDSI A", -> Analisis Dan Desain Sistem Informasi Kelas A
 	//  "PAW C", -> Pengembangan Aplikasi Web Kelas C
 	// }
 	filterByKelas := []string{
-		// "",
+		// "MPTI Z",
+		// "KI Z",
+		// "TIS Z",
+		// "ADPI Z",
+		// "AS Z",
+		// "IDESI Z",
+		// "TKTI Z",
+		// "PAM Z",
 	}
-	filteredByKelas := planService.FilterByKelas(filterByKelas, filtered)
+	// Kata kunci dimasukkan disini
+	filteredByKelas := planService.FilterByKelas("with", filterByKelas, filtered)
 
 	// Menampilkan semua jadwal yang sudah di filter dari random
 	Show(filteredByKelas, planService, matkulService)
